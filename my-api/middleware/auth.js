@@ -1,21 +1,31 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = function (req, res, next) {
+const authMiddleware = (req, res, next) => {
+    // 1. Get Token
+    const token = req.header('Authorization');
 
-    // Get token from header
-    const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
-
-    // Check if no token
+    // 2. Check if token exists
     if (!token) {
-        return res.status(401).json({ error: 'No token, authorization denied' });
+        return res.status(401).json({ error: "Access Denied. No Token." });
     }
-    // Verify token
+
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.admin = decoded.admin;
-        next();
+        // 3. Clean Token ("Bearer " removal)
+        // If the token comes as "Bearer eyJ...", we remove the first 7 chars.
+        // If it comes as just "eyJ...", we keep it.
+        const tokenString = token.startsWith("Bearer ") ? token.slice(7, token.length) : token;
+
+        // 4. Verify Token
+        // CRITICAL: We use process.env.JWT_SECRET or fallback for safety
+        const secret = process.env.JWT_SECRET || "rishit_secret_key_123";
+        const verified = jwt.verify(tokenString, secret);
+
+        // 5. ATTACH USER TO REQUEST (This is the missing link!)
+        req.user = verified; 
+        
+        next(); // Pass to the next handler
     } catch (err) {
-        res.status(401).json({ error: 'Token is not valid' });
+        res.status(400).json({ error: "Invalid Token" });
     }
 };
 
