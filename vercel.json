@@ -7,8 +7,7 @@
     },
     {
       "src": "./my-mern-app/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
@@ -18,14 +17,14 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/my-mern-app/dist/$1"
+      "dest": "/my-mern-app/$1"
     },
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/my-mern-app/dist/index.html"
+      "dest": "/my-mern-app/index.html"
     }
   ]
 }
