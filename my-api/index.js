@@ -192,8 +192,12 @@ app.put('/api/change-password', authMiddleware, async (req, res) => {
 
 
 // start the server
-const PORT = process.env.PORT || 5000; 
+// NEW WAY (For Vercel)
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Only listen if we are running locally (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app; // Export the app for Vercel

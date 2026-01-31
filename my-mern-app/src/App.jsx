@@ -29,7 +29,7 @@ function App() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-        const res = await fetch("http://localhost:5000/api/users");
+        const res = await fetch("/api/users");
         const data = await res.json();
         setUsers(data);
     } catch (err) {
