@@ -166,24 +166,18 @@ app.put('/api/change-password', authMiddleware, async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
         
-        // DEBUG LOGS (Check these in Vercel Dashboard -> Logs)
-        console.log("1. Token Payload:", req.user); 
-        
-        const adminId = req.user.id; 
-        console.log("2. Admin ID extracted:", adminId);
+        // FIX: Use 'adminId' because that is what you used in the Login route
+        const adminId = req.user.adminId; 
 
         // 1. Find Admin
         const admin = await Admin.findById(adminId);
         if (!admin) {
-            console.log("3. Admin NOT found in DB");
             return res.status(404).json({ error: "Admin not found" });
         }
-        console.log("3. Admin Found:", admin.username);
 
         // 2. Check Old Password
         const isMatch = await bcrypt.compare(oldPassword, admin.password);
         if (!isMatch) {
-            console.log("4. Password Mismatch");
             return res.status(400).json({ error: "Incorrect Old Password" });
         }
 
@@ -192,15 +186,13 @@ app.put('/api/change-password', authMiddleware, async (req, res) => {
         admin.password = await bcrypt.hash(newPassword, salt);
         await admin.save();
         
-        console.log("5. Success!");
         res.json({ message: "Password updated successfully!" });
 
     } catch (error) {
-        console.error("CRITICAL ERROR:", error); // This shows the real crash reason
-        res.status(500).json({ error: error.message }); // Sends the error to your frontend popup
+        console.error("Password Update Error:", error);
+        res.status(500).json({ error: error.message });
     }
 });
-
 
 // start the server
 // NEW WAY (For Vercel)
